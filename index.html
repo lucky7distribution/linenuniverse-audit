@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Linen Universe SEO and technical audit dashboard demo."
+      content="Evidence-based SEO and technical audit dashboard for Linen Universe."
     />
     <meta name="theme-color" content="#f7f8fa" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>Linen Universe | Audit Dashboard</title>
     <style>
       :root {
@@ -392,6 +393,248 @@
         text-align: center;
       }
 
+      .scope-note {
+        margin-top: 12px;
+        color: #707c74;
+        font-size: 11px;
+        line-height: 1.55;
+      }
+
+      .metrics .metric-value.ready {
+        color: #25342b;
+      }
+
+      .panel.full-width {
+        grid-column: 1 / -1;
+      }
+
+      .table-tools {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 9px;
+        margin: 14px 0;
+      }
+
+      .table-tools input,
+      .table-tools select {
+        min-height: 35px;
+        padding: 0 10px;
+        border: 1px solid #e1e7e2;
+        border-radius: 7px;
+        color: #39463e;
+        background: #fff;
+        font-size: 11px;
+      }
+
+      .table-tools input {
+        min-width: 220px;
+        flex: 1 1 240px;
+      }
+
+      .table-tools select {
+        max-width: 220px;
+      }
+
+      .table-wrap {
+        overflow: auto;
+        border: 1px solid #edf0ed;
+        border-radius: 8px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      th,
+      td {
+        padding: 10px 11px;
+        border-bottom: 1px solid #edf0ed;
+        font-size: 11px;
+        vertical-align: top;
+      }
+
+      th {
+        color: #758179;
+        background: #fafbfa;
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .sort-button {
+        padding: 0;
+        border: 0;
+        color: inherit;
+        background: none;
+        font: inherit;
+        font-weight: inherit;
+        cursor: pointer;
+      }
+
+      .url-cell {
+        min-width: 270px;
+        max-width: 360px;
+        overflow-wrap: anywhere;
+      }
+
+      .url-cell a,
+      .issue-url-list a {
+        color: #287452;
+        text-decoration: none;
+      }
+
+      .url-cell a:hover,
+      .issue-url-list a:hover {
+        text-decoration: underline;
+      }
+
+      .muted-cell {
+        max-width: 250px;
+        color: #79857d;
+        overflow-wrap: anywhere;
+      }
+
+      .severity {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 7px;
+        border-radius: 999px;
+        font-size: 9px;
+        font-weight: 750;
+        white-space: nowrap;
+      }
+
+      .severity-high {
+        color: #a63e38;
+        background: #fff0ef;
+      }
+
+      .severity-medium {
+        color: #936719;
+        background: #fff7e6;
+      }
+
+      .severity-low {
+        color: #536e5c;
+        background: #edf5ef;
+      }
+
+      .issue-title {
+        color: #27352c;
+        font-weight: 650;
+      }
+
+      .issue-details {
+        margin-top: 6px;
+        color: #67746c;
+        line-height: 1.55;
+      }
+
+      .issue-details summary {
+        color: #287452;
+        cursor: pointer;
+        font-size: 10px;
+      }
+
+      .issue-details p {
+        margin: 7px 0;
+      }
+
+      .issue-url-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px 12px;
+        margin-top: 7px;
+      }
+
+      .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        padding-top: 12px;
+        color: #758179;
+        font-size: 10px;
+      }
+
+      .pagination button,
+      .download-link {
+        min-height: 32px;
+        padding: 0 10px;
+        border: 1px solid #dfe7e1;
+        border-radius: 7px;
+        color: #2b6f4f;
+        background: #fff;
+        font-size: 10px;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .pagination button:disabled {
+        color: #aeb7b1;
+        cursor: not-allowed;
+      }
+
+      .coverage-grid {
+        display: grid;
+        gap: 0;
+        margin-top: 14px;
+      }
+
+      .coverage-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        padding: 11px 0;
+        border-top: 1px solid #f0f2f0;
+        font-size: 11px;
+      }
+
+      .coverage-row span:first-child {
+        color: #647168;
+      }
+
+      .coverage-row span:last-child {
+        color: #65796b;
+        text-align: right;
+      }
+
+      .error-banner {
+        display: none;
+        margin-top: 14px;
+        padding: 11px 13px;
+        border: 1px solid #f0cfcd;
+        border-radius: 8px;
+        color: #9c3935;
+        background: #fff4f3;
+        font-size: 11px;
+      }
+
+      .error-banner.visible {
+        display: block;
+      }
+
+      .status-dot.complete {
+        background: #3a9369;
+        box-shadow: 0 0 0 4px #dceee4;
+      }
+
+      .status-dot.failed {
+        background: #c94c43;
+        box-shadow: 0 0 0 4px #f7dedc;
+      }
+
+      .nowrap {
+        white-space: nowrap;
+      }
+
       @media (max-width: 900px) {
         .app {
           grid-template-columns: 210px minmax(0, 1fr);
@@ -499,8 +742,8 @@
           <a href="#reports"><span class="nav-icon">▤</span>Reports</a>
         </nav>
         <div class="sidebar-foot">
-          Audit workspace<br />
-          Data will appear after the first verified crawl.
+          Initial public crawl<br />
+          406 sitemap URLs · 42 category routes
         </div>
       </aside>
 
@@ -517,81 +760,477 @@
               <h1>SEO &amp; technical audit</h1>
               <p class="subtitle">Linen Universe · https://www.linenuniverse.net/</p>
             </div>
-            <div class="demo-badge">DEMO · NO AUDIT DATA YET</div>
+            <div class="demo-badge">INITIAL AUDIT · LIMITED SCOPE</div>
           </header>
 
-          <section class="status-banner" aria-label="Audit status">
-            <span class="status-dot" aria-hidden="true"></span>
+          <section class="status-banner" aria-label="Audit status" aria-live="polite">
+            <span class="status-dot" id="status-dot" aria-hidden="true"></span>
             <div>
-              <strong>Ready for the first crawl</strong>
-              <p>
-                This dashboard is an initial UI demo. No live crawl has been run,
-                so metrics and findings are intentionally left blank.
-              </p>
+              <strong id="audit-status-title">Loading verified crawl results</strong>
+              <p id="audit-status-copy">Reading the collected public-site audit data.</p>
+            </div>
+          </section>
+          <div class="error-banner" id="data-error" role="alert"></div>
+
+          <div class="section-heading">
+            <h2>Measured snapshot</h2>
+            <span class="section-note" id="audit-date">Loading audit date…</span>
+          </div>
+          <section class="metrics" aria-label="Measured audit metrics">
+            <article class="metric">
+              <div class="metric-top"><span>Sitemap URLs checked</span><span class="metric-icon">⌕</span></div>
+              <div class="metric-value" id="metric-sitemap">—</div>
+              <div class="metric-foot">All sitemap entries tested</div>
+            </article>
+            <article class="metric">
+              <div class="metric-top"><span>Broken category destinations</span><span class="metric-icon">!</span></div>
+              <div class="metric-value" id="metric-broken">—</div>
+              <div class="metric-foot">Confirmed HTTP 404 responses</div>
+            </article>
+            <article class="metric">
+              <div class="metric-top"><span>Off-host canonicals</span><span class="metric-icon">↗</span></div>
+              <div class="metric-value" id="metric-canonical">—</div>
+              <div class="metric-foot">Point to linenuniverse.odoo.com</div>
+            </article>
+            <article class="metric">
+              <div class="metric-top"><span>Missing meta descriptions</span><span class="metric-icon">T</span></div>
+              <div class="metric-value" id="metric-description">—</div>
+              <div class="metric-foot">Among direct HTML pages</div>
+            </article>
+          </section>
+
+          <p class="scope-note" id="scope-note">
+            Audit scope and limitations will appear here when the crawl data loads.
+          </p>
+
+          <div class="section-heading">
+            <h2>Verified issue register</h2>
+            <span class="section-note" id="issue-count">Loading…</span>
+          </div>
+          <section class="panel full-width" id="issues" aria-label="Verified issues">
+            <div class="table-tools">
+              <input id="issue-search" type="search" placeholder="Search issues or affected URLs" aria-label="Search issues" />
+              <select id="issue-category" aria-label="Filter issues by category">
+                <option value="">All categories</option>
+              </select>
+              <select id="issue-severity" aria-label="Filter issues by severity">
+                <option value="">All severities</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Severity</th>
+                    <th scope="col">Finding &amp; evidence</th>
+                    <th scope="col">Affected URLs</th>
+                    <th scope="col">Confidence</th>
+                  </tr>
+                </thead>
+                <tbody id="issue-rows">
+                  <tr><td colspan="4">Loading crawl findings…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <div class="section-heading" id="crawl">
+            <h2>URL explorer</h2>
+            <span class="section-note" id="url-count">Loading inventory…</span>
+          </div>
+          <section class="panel full-width" aria-label="URL inventory">
+            <div class="table-tools">
+              <input id="url-search" type="search" placeholder="Search URL, title, or canonical" aria-label="Search URLs" />
+              <select id="url-page-type" aria-label="Filter URLs by page type">
+                <option value="">All page types</option>
+              </select>
+              <select id="url-status" aria-label="Filter URLs by response status">
+                <option value="">All statuses</option>
+                <option value="200">200</option>
+                <option value="404">404</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col"><button class="sort-button" data-sort="url">URL ↕</button></th>
+                    <th scope="col"><button class="sort-button" data-sort="page_type">Type ↕</button></th>
+                    <th scope="col"><button class="sort-button" data-sort="status">HTTP ↕</button></th>
+                    <th scope="col">Indexability signal</th>
+                    <th scope="col"><button class="sort-button" data-sort="title">Title ↕</button></th>
+                    <th scope="col"><button class="sort-button" data-sort="inbound_internal_links">Inbound links ↕</button></th>
+                  </tr>
+                </thead>
+                <tbody id="url-rows">
+                  <tr><td colspan="6">Loading URL inventory…</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination">
+              <span id="url-page-status">Page 1</span>
+              <button id="url-previous" type="button" disabled>Previous</button>
+              <button id="url-next" type="button" disabled>Next</button>
             </div>
           </section>
 
           <div class="section-heading">
-            <h2>Audit snapshot</h2>
-            <span class="section-note">Real results will populate after data collection</span>
-          </div>
-          <section class="metrics" aria-label="Audit metrics">
-            <article class="metric">
-              <div class="metric-top"><span>URLs discovered</span><span class="metric-icon">⌕</span></div>
-              <div class="metric-value">—</div>
-              <div class="metric-foot">Awaiting crawl</div>
-            </article>
-            <article class="metric">
-              <div class="metric-top"><span>Indexable pages</span><span class="metric-icon">◎</span></div>
-              <div class="metric-value">—</div>
-              <div class="metric-foot">Awaiting crawl</div>
-            </article>
-            <article class="metric">
-              <div class="metric-top"><span>Issues found</span><span class="metric-icon">⚑</span></div>
-              <div class="metric-value">—</div>
-              <div class="metric-foot">Awaiting analysis</div>
-            </article>
-            <article class="metric">
-              <div class="metric-top"><span>Health score</span><span class="metric-icon">◷</span></div>
-              <div class="metric-value">—</div>
-              <div class="metric-foot">Unscored until measured</div>
-            </article>
-          </section>
-
-          <div class="section-heading">
-            <h2>Audit details</h2>
-            <span class="section-note">Evidence-based findings only</span>
+            <h2>Coverage &amp; measurements</h2>
+            <span class="section-note">Unmeasured areas remain unscored</span>
           </div>
           <section class="lower-grid">
-            <article class="panel" id="issues">
-              <div class="panel-title"><h2>Priority issues</h2><span class="section-note">No findings yet</span></div>
-              <div class="empty-state">
-                <div class="empty-icon" aria-hidden="true">✓</div>
-                <strong>Findings will appear here</strong>
-                <p>Each issue will include severity, affected URLs, evidence, and a recommended fix.</p>
-              </div>
+            <article class="panel" id="seo">
+              <div class="panel-title"><h2>On-page SEO signals</h2><span class="section-note">Measured from page HTML</span></div>
+              <div class="coverage-grid" id="seo-coverage"></div>
+              <p class="scope-note">Duplicate metadata groups are flagged for review; product variants may legitimately share some wording.</p>
             </article>
-            <article class="panel" id="crawl">
-              <div class="panel-title"><h2>Audit coverage</h2><span class="section-note">Not started</span></div>
-              <div class="check-list">
-                <div class="check-row"><span>Crawlability &amp; indexability</span><span class="check-state">Pending</span></div>
-                <div class="check-row" id="seo"><span>On-page SEO</span><span class="check-state">Pending</span></div>
-                <div class="check-row"><span>Odoo &amp; eCommerce checks</span><span class="check-state">Pending</span></div>
-                <div class="check-row" id="performance"><span>Performance &amp; accessibility</span><span class="check-state">Pending</span></div>
-              </div>
+            <article class="panel" id="performance">
+              <div class="panel-title"><h2>Performance &amp; remaining checks</h2><span class="section-note">Not yet measured</span></div>
+              <div class="coverage-grid" id="remaining-coverage"></div>
+              <p class="scope-note">No health score is shown until the remaining categories have real measurements.</p>
             </article>
-            <article class="panel" id="reports">
-              <div class="panel-title"><h2>Reports &amp; downloads</h2><span class="section-note">Not available yet</span></div>
-              <div class="empty-state">
-                <div class="empty-icon" aria-hidden="true">▤</div>
-                <strong>Exports will be available after an audit</strong>
-                <p>Downloadable reports will be generated from verified crawl results.</p>
+            <article class="panel full-width" id="reports">
+              <div class="panel-title"><h2>Current audit data</h2><span class="section-note">Exports use collected findings</span></div>
+              <div class="table-tools">
+                <button class="download-link" id="download-issues" type="button">Download issue register (CSV)</button>
+                <a class="download-link" href="/audit-data/dashboard-summary.json" download="linen-audit-summary.json">Download summary (JSON)</a>
+                <a class="download-link" href="/audit-data/url-inventory.json" download="linen-url-inventory.json">Download URL inventory (JSON)</a>
               </div>
+              <p class="scope-note">These are initial public-crawl exports, not the complete final PDF/XLSX report set.</p>
             </article>
           </section>
-          <p class="footer-note">Dashboard UI preview · Audit data is not yet connected</p>
+          <p class="footer-note">Evidence-based public crawl · authenticated Odoo and Google Search Console data were not used</p>
         </div>
       </main>
     </div>
+    <script>
+      const byId = (id) => document.getElementById(id);
+      const pageSize = 50;
+      let auditData;
+      let urlInventory = [];
+      let urlPage = 0;
+      let urlSort = "url";
+      let urlSortDirection = 1;
+
+      function addText(parent, tag, className, text) {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        element.textContent = text;
+        parent.appendChild(element);
+        return element;
+      }
+
+      function addUrlLink(parent, url, label) {
+        const link = document.createElement("a");
+        link.href = url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = label || url;
+        parent.appendChild(link);
+      }
+
+      function severityRank(value) {
+        return ({ High: 0, Medium: 1, Low: 2 })[value] ?? 3;
+      }
+
+      function setMetric(id, value) {
+        const element = byId(id);
+        element.textContent = value.toLocaleString("en-US");
+        element.classList.add("ready");
+      }
+
+      function addCoverageRow(parent, label, value) {
+        const row = document.createElement("div");
+        row.className = "coverage-row";
+        addText(row, "span", "", label);
+        addText(row, "span", "", value);
+        parent.appendChild(row);
+      }
+
+      function renderIssues() {
+        if (!auditData) return;
+        const query = byId("issue-search").value.trim().toLowerCase();
+        const category = byId("issue-category").value;
+        const severity = byId("issue-severity").value;
+        const filtered = auditData.issues
+          .filter((item) => !category || item.category === category)
+          .filter((item) => !severity || item.severity === severity)
+          .filter((item) => !query || JSON.stringify(item).toLowerCase().includes(query))
+          .sort((a, b) => severityRank(a.severity) - severityRank(b.severity));
+        const body = byId("issue-rows");
+        body.replaceChildren();
+        byId("issue-count").textContent = `${filtered.length} issue groups shown`;
+        if (!filtered.length) {
+          const row = body.insertRow();
+          const cell = row.insertCell();
+          cell.colSpan = 4;
+          cell.textContent = "No issues match these filters.";
+          return;
+        }
+
+        for (const item of filtered) {
+          const row = body.insertRow();
+          const severityCell = row.insertCell();
+          addText(severityCell, "span", `severity severity-${item.severity.toLowerCase()}`, item.severity);
+
+          const findingCell = row.insertCell();
+          findingCell.className = "url-cell";
+          addText(findingCell, "div", "issue-title", item.title);
+          const details = document.createElement("details");
+          details.className = "issue-details";
+          const summary = document.createElement("summary");
+          summary.textContent = "Evidence & recommended fix";
+          details.appendChild(summary);
+          addText(details, "p", "", item.evidence);
+          addText(details, "p", "", `Recommended: ${item.recommended_fix}`);
+          if (item.implementation_type) {
+            addText(details, "p", "", `Likely implementation area: ${item.implementation_type}`);
+          }
+          const samples = item.affected_urls.slice(0, 5);
+          if (samples.length) {
+            const list = document.createElement("div");
+            list.className = "issue-url-list";
+            for (const url of samples) addUrlLink(list, url, new URL(url).pathname);
+            details.appendChild(list);
+          }
+          if (item.source_page_samples?.length) {
+            addText(details, "p", "", `Sample source pages (${item.source_page_count} total):`);
+            const sources = document.createElement("div");
+            sources.className = "issue-url-list";
+            for (const url of item.source_page_samples.slice(0, 5)) {
+              addUrlLink(sources, url, new URL(url).pathname);
+            }
+            details.appendChild(sources);
+          }
+          findingCell.appendChild(details);
+
+          row.insertCell().textContent = item.affected_url_count.toLocaleString("en-US");
+          row.insertCell().textContent = `${item.confidence}/10`;
+        }
+      }
+
+      function renderUrlInventory() {
+        const query = byId("url-search").value.trim().toLowerCase();
+        const type = byId("url-page-type").value;
+        const status = byId("url-status").value;
+        const filtered = urlInventory
+          .filter((item) => !type || item.page_type === type)
+          .filter((item) => !status || String(item.status) === status)
+          .filter((item) => !query || [
+            item.url,
+            item.title,
+            item.canonical,
+            item.meta_description,
+          ].join(" ").toLowerCase().includes(query))
+          .sort((a, b) => {
+            const left = a[urlSort] ?? "";
+            const right = b[urlSort] ?? "";
+            const comparison = typeof left === "number" && typeof right === "number"
+              ? left - right
+              : String(left).localeCompare(String(right));
+            return comparison * urlSortDirection;
+          });
+        const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+        urlPage = Math.min(urlPage, pageCount - 1);
+        const visible = filtered.slice(urlPage * pageSize, (urlPage + 1) * pageSize);
+        const body = byId("url-rows");
+        body.replaceChildren();
+        byId("url-count").textContent = `${filtered.length.toLocaleString("en-US")} URLs shown`;
+        byId("url-page-status").textContent = `Page ${urlPage + 1} of ${pageCount}`;
+        byId("url-previous").disabled = urlPage === 0;
+        byId("url-next").disabled = urlPage >= pageCount - 1;
+
+        if (!visible.length) {
+          const row = body.insertRow();
+          const cell = row.insertCell();
+          cell.colSpan = 6;
+          cell.textContent = "No URLs match these filters.";
+          return;
+        }
+        for (const item of visible) {
+          const row = body.insertRow();
+          const urlCell = row.insertCell();
+          urlCell.className = "url-cell";
+          addUrlLink(urlCell, item.url, item.url);
+          row.insertCell().textContent = item.page_type;
+          const statusCell = row.insertCell();
+          statusCell.textContent = item.status === null ? "Not checked" : String(item.status);
+          const indexabilityCell = row.insertCell();
+          indexabilityCell.className = "muted-cell";
+          indexabilityCell.textContent = item.indexability;
+          const titleCell = row.insertCell();
+          titleCell.className = "muted-cell";
+          titleCell.textContent = item.title || "Missing";
+          row.insertCell().textContent = item.inbound_internal_links.toLocaleString("en-US");
+        }
+      }
+
+      function downloadIssueCsv() {
+        const columns = [
+          "id",
+          "title",
+          "category",
+          "severity",
+          "confidence",
+          "affected_url_count",
+          "evidence",
+          "recommended_fix",
+          "affected_urls",
+        ];
+        const quote = (value) => `"${String(value ?? "").replaceAll('"', '""')}"`;
+        const lines = [
+          columns.map(quote).join(","),
+          ...auditData.issues.map((item) => columns.map((key) => {
+            const value = key === "affected_urls" ? item.affected_urls.join(" | ") : item[key];
+            return quote(value);
+          }).join(",")),
+        ];
+        const blob = new Blob([lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "linen-audit-issues.csv";
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      }
+
+      async function loadDashboard() {
+        try {
+          const [summaryResponse, inventoryResponse] = await Promise.all([
+            fetch("/audit-data/dashboard-summary.json", { cache: "no-store" }),
+            fetch("/audit-data/url-inventory.json", { cache: "no-store" }),
+          ]);
+          if (!summaryResponse.ok || !inventoryResponse.ok) {
+            throw new Error(`Audit data request failed (${summaryResponse.status}/${inventoryResponse.status}).`);
+          }
+          auditData = await summaryResponse.json();
+          urlInventory = await inventoryResponse.json();
+
+          const { audit, metrics } = auditData;
+          const completed = new Date(audit.completed_at);
+          const dateText = new Intl.DateTimeFormat(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short",
+          }).format(completed);
+          const durationMinutes = Math.round(audit.duration_seconds / 60);
+          byId("audit-date").textContent = `Last crawl ${dateText} · about ${durationMinutes} min active crawl time`;
+          byId("audit-status-title").textContent = "Initial public crawl completed";
+          byId("audit-status-copy").textContent =
+            `${audit.sitemap_urls_checked}/${audit.sitemap_entries} sitemap URLs returned HTTP 200 after redirects. ` +
+            `${audit.linked_category_urls_checked} linked category paths were checked separately; ` +
+            `${metrics.broken_category_destinations} returned 404.`;
+          byId("status-dot").classList.add("complete");
+          byId("scope-note").textContent =
+            `${audit.scope} This is not yet a full navigation/link crawl; excluded route families and unmeasured checks are listed below. ` +
+            `No overall health score is calculated from this partial scope.`;
+
+          setMetric("metric-sitemap", metrics.sitemap_urls);
+          setMetric("metric-broken", metrics.broken_category_destinations);
+          setMetric("metric-canonical", metrics.cross_host_canonicals);
+          setMetric("metric-description", metrics.missing_meta_descriptions);
+
+          const categories = [...new Set(auditData.issues.map((item) => item.category))].sort();
+          for (const value of categories) {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = value;
+            byId("issue-category").appendChild(option);
+          }
+          const pageTypes = [...new Set(urlInventory.map((item) => item.page_type))].sort();
+          for (const value of pageTypes) {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = value;
+            byId("url-page-type").appendChild(option);
+          }
+
+          renderIssues();
+          renderUrlInventory();
+          addCoverageRow(
+            byId("seo-coverage"),
+            "Direct sitemap HTML pages",
+            String(audit.html_pages),
+          );
+          addCoverageRow(
+            byId("seo-coverage"),
+            "Pages missing descriptions",
+            String(metrics.missing_meta_descriptions),
+          );
+          addCoverageRow(
+            byId("seo-coverage"),
+            "Duplicate title groups / URLs",
+            `${metrics.duplicate_title_groups} / ${metrics.duplicate_title_urls}`,
+          );
+          addCoverageRow(
+            byId("seo-coverage"),
+            "Duplicate description groups / URLs",
+            `${metrics.duplicate_description_groups} / ${metrics.duplicate_description_urls}`,
+          );
+          addCoverageRow(byId("seo-coverage"), "Pages missing non-empty H1", String(metrics.missing_h1_pages));
+          addCoverageRow(byId("seo-coverage"), "Images missing/empty alt text", String(metrics.images_missing_alt));
+          addCoverageRow(byId("remaining-coverage"), "Sitemap HTTP errors", String(metrics.sitemap_http_errors));
+          addCoverageRow(byId("remaining-coverage"), "Sitemap duplicate URLs", "0 observed");
+          addCoverageRow(byId("remaining-coverage"), "robots.txt", "No wildcard disallow observed");
+          addCoverageRow(
+            byId("remaining-coverage"),
+            "Linked category routes",
+            `${audit.linked_category_urls_checked} checked · ${metrics.broken_category_destinations} returned 404`,
+          );
+          addCoverageRow(
+            byId("remaining-coverage"),
+            "Performance / Core Web Vitals",
+            "Not tested",
+          );
+          addCoverageRow(byId("remaining-coverage"), "Structured data validation", "Not tested");
+          addCoverageRow(byId("remaining-coverage"), "External link status", "Not tested");
+          addCoverageRow(byId("remaining-coverage"), "Google indexing / traffic", "No Search Console data");
+          byId("download-issues").addEventListener("click", downloadIssueCsv);
+        } catch (error) {
+          byId("status-dot").classList.add("failed");
+          byId("audit-status-title").textContent = "Could not load crawl data";
+          byId("audit-status-copy").textContent = "The dashboard did not receive its audit dataset.";
+          byId("data-error").textContent = error instanceof Error ? error.message : String(error);
+          byId("data-error").classList.add("visible");
+        }
+      }
+
+      byId("issue-search").addEventListener("input", renderIssues);
+      byId("issue-category").addEventListener("change", renderIssues);
+      byId("issue-severity").addEventListener("change", renderIssues);
+      byId("url-search").addEventListener("input", () => {
+        urlPage = 0;
+        renderUrlInventory();
+      });
+      byId("url-page-type").addEventListener("change", () => {
+        urlPage = 0;
+        renderUrlInventory();
+      });
+      byId("url-status").addEventListener("change", () => {
+        urlPage = 0;
+        renderUrlInventory();
+      });
+      byId("url-previous").addEventListener("click", () => {
+        urlPage = Math.max(0, urlPage - 1);
+        renderUrlInventory();
+      });
+      byId("url-next").addEventListener("click", () => {
+        urlPage += 1;
+        renderUrlInventory();
+      });
+      document.querySelectorAll("[data-sort]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const key = button.dataset.sort;
+          if (urlSort === key) urlSortDirection *= -1;
+          else {
+            urlSort = key;
+            urlSortDirection = 1;
+          }
+          renderUrlInventory();
+        });
+      });
+      loadDashboard();
+    </script>
   </body>
 </html>
