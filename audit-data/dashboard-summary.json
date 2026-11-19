@@ -1,15 +1,15 @@
 {
   "audit": {
-    "run_id": "20261119T153504Z-fc2c8d28",
+    "run_id": "20261119T155105Z-817a500a",
     "cache_policy": "Unique per-request query nonce, no-cache/no-store headers, no local response reuse; response cache headers and SHA-256 recorded. Origin-generated caches cannot be forcibly purged by this public crawler.",
     "source_crawl_files": [
-      "sitemap-crawl-20261119-fresh.jsonl",
-      "linked-category-crawl-20261119-fresh.jsonl"
+      "sitemap-crawl-20261119T155105Z-2e20f287.jsonl",
+      "linked-category-crawl-20261119T155105Z-2e20f287.jsonl"
     ],
     "site": "https://www.linenuniverse.net/",
-    "started_at": "2026-11-19T15:35:08.358298+00:00",
-    "completed_at": "2026-11-19T15:43:16.227444+00:00",
-    "duration_seconds": 347,
+    "started_at": "2026-11-19T15:51:06.666052+00:00",
+    "completed_at": "2026-11-19T15:55:32.724323+00:00",
+    "duration_seconds": 265,
     "scope": "Sitemap crawl plus linked category URLs without query strings or pagination.",
     "sitemap_entries": 406,
     "unique_sitemap_urls": 406,
@@ -474,7 +474,7 @@
       },
       "implementation_type": "Odoo website/domain configuration or shared template",
       "finding_status": "Confirmed",
-      "last_verified_at": "2026-11-19T15:43:16.227444+00:00"
+      "last_verified_at": "2026-11-19T15:55:32.724323+00:00"
     },
     {
       "id": "broken-category-navigation",
@@ -756,7 +756,7 @@
       ],
       "implementation_type": "Shared Odoo navigation/category configuration",
       "finding_status": "Confirmed",
-      "last_verified_at": "2026-11-19T15:43:16.227444+00:00"
+      "last_verified_at": "2026-11-19T15:55:32.724323+00:00"
     },
     {
       "id": "linked-category-redirects",
@@ -845,7 +845,7 @@
       ],
       "implementation_type": "Shared Odoo navigation/category configuration",
       "finding_status": "Confirmed",
-      "last_verified_at": "2026-11-19T15:43:16.227444+00:00"
+      "last_verified_at": "2026-11-19T15:55:32.724323+00:00"
     },
     {
       "id": "duplicate-page-titles",
@@ -871,7 +871,7 @@
       ],
       "implementation_type": "Odoo product SEO fields/content",
       "finding_status": "Confirmed",
-      "last_verified_at": "2026-11-19T15:43:16.227444+00:00"
+      "last_verified_at": "2026-11-19T15:55:32.724323+00:00"
     },
     {
       "id": "sitemap-redirect-urls",
@@ -904,7 +904,7 @@
       ],
       "implementation_type": "Odoo sitemap/content configuration",
       "finding_status": "Confirmed",
-      "last_verified_at": "2026-11-19T15:43:16.227444+00:00"
+      "last_verified_at": "2026-11-19T15:55:32.724323+00:00"
     },
     {
       "id": "missing-h1",
@@ -920,7 +920,7 @@
       "recommended_fix": "Review each affected page template and add a descriptive visible heading where it improves page clarity.",
       "implementation_type": "Odoo page/template content",
       "finding_status": "Confirmed",
-      "last_verified_at": "2026-11-19T15:43:16.227444+00:00"
+      "last_verified_at": "2026-11-19T15:55:32.724323+00:00"
     }
   ],
   "unscored_assessments": [
@@ -931,7 +931,7 @@
     "Google Search Console/indexation"
   ],
   "comparison": {
-    "previous_completed_at": "2026-11-12T19:42:04.131932+00:00",
+    "previous_completed_at": "2026-11-19T15:43:16.227444+00:00",
     "metrics": [
       {
         "metric": "sitemap_urls",
@@ -963,37 +963,37 @@
       },
       {
         "metric": "missing_meta_descriptions",
-        "previous": 70,
+        "previous": 0,
         "current": 0,
-        "change": -70,
+        "change": 0,
         "comparable": true
       },
       {
         "metric": "duplicate_title_groups",
-        "previous": 13,
+        "previous": 1,
         "current": 1,
-        "change": -12,
+        "change": 0,
         "comparable": true
       },
       {
         "metric": "duplicate_title_urls",
-        "previous": 32,
+        "previous": 2,
         "current": 2,
-        "change": -30,
+        "change": 0,
         "comparable": true
       },
       {
         "metric": "duplicate_description_groups",
-        "previous": 9,
+        "previous": 0,
         "current": 0,
-        "change": -9,
+        "change": 0,
         "comparable": true
       },
       {
         "metric": "duplicate_description_urls",
-        "previous": 23,
+        "previous": 0,
         "current": 0,
-        "change": -23,
+        "change": 0,
         "comparable": true
       },
       {
@@ -1005,9 +1005,9 @@
       },
       {
         "metric": "category_redirects",
-        "previous": 28,
+        "previous": 8,
         "current": 8,
-        "change": -20,
+        "change": 0,
         "comparable": true
       },
       {
@@ -1026,17 +1026,31 @@
       },
       {
         "metric": "images_checked",
-        "previous": 2257,
+        "previous": 2222,
         "current": 2222,
-        "change": -35,
+        "change": 0,
         "comparable": true
       },
       {
         "metric": "images_missing_alt",
-        "previous": 27,
+        "previous": 0,
         "current": 0,
-        "change": -27,
+        "change": 0,
         "comparable": false
+      },
+      {
+        "metric": "images_empty_alt_review",
+        "previous": 0,
+        "current": 0,
+        "change": 0,
+        "comparable": true
+      },
+      {
+        "metric": "images_explicitly_decorative",
+        "previous": 9,
+        "current": 9,
+        "change": 0,
+        "comparable": true
       },
       {
         "metric": "sitemap_entries_missing_lastmod",
@@ -1050,9 +1064,6 @@
       {
         "id": "broken-category-navigation",
         "persisting": [
-          "https://www.linenuniverse.net/shop/category/mats-111"
-        ],
-        "newly_detected": [
           "https://www.linenuniverse.net/shop/category/dining-cookware-89",
           "https://www.linenuniverse.net/shop/category/dining-dinnerware-88",
           "https://www.linenuniverse.net/shop/category/home-decor-artificial-flowers-trees-73",
@@ -1060,6 +1071,7 @@
           "https://www.linenuniverse.net/shop/category/home-decor-wall-decor-81",
           "https://www.linenuniverse.net/shop/category/kitchen-kitchen-curtains-82",
           "https://www.linenuniverse.net/shop/category/kitchen-kitchenware-84",
+          "https://www.linenuniverse.net/shop/category/mats-111",
           "https://www.linenuniverse.net/shop/category/rugs-bamboo-collection-91",
           "https://www.linenuniverse.net/shop/category/rugs-bristol-rugs-92",
           "https://www.linenuniverse.net/shop/category/rugs-empire-collection-rugs-93",
@@ -1067,52 +1079,8 @@
           "https://www.linenuniverse.net/shop/category/rugs-mohawk-rugs-98",
           "https://www.linenuniverse.net/shop/category/rugs-shaggy-collection-rugs-99"
         ],
-        "no_longer_detected": [
-          "https://www.linenuniverse.net/shop/category/artificial-flowers-trees-73",
-          "https://www.linenuniverse.net/shop/category/bamboo-collection-91",
-          "https://www.linenuniverse.net/shop/category/bristol-rugs-92",
-          "https://www.linenuniverse.net/shop/category/cookware-89",
-          "https://www.linenuniverse.net/shop/category/dinnerware-88",
-          "https://www.linenuniverse.net/shop/category/empire-collection-rugs-93",
-          "https://www.linenuniverse.net/shop/category/kitchen-curtains-82",
-          "https://www.linenuniverse.net/shop/category/kitchen-rugs-mats-97",
-          "https://www.linenuniverse.net/shop/category/kitchenware-84",
-          "https://www.linenuniverse.net/shop/category/mirrors-76",
-          "https://www.linenuniverse.net/shop/category/mohawk-rugs-98",
-          "https://www.linenuniverse.net/shop/category/shaggy-collection-rugs-99",
-          "https://www.linenuniverse.net/shop/category/wall-decor-81"
-        ],
-        "note": "No longer detected is not proof of a fixed destination: a stale link may have been removed or replaced. Compare source evidence. Coverage and rule changes also affect comparisons."
-      },
-      {
-        "id": "duplicate-meta-descriptions",
-        "persisting": [],
         "newly_detected": [],
-        "no_longer_detected": [
-          "https://www.linenuniverse.net/shop/embroidered-table-runners-19339",
-          "https://www.linenuniverse.net/shop/embroidered-table-runners-20183",
-          "https://www.linenuniverse.net/shop/hd-1p2c-300-3-piece-silver-decorative-plate-candle-holder-set-19066",
-          "https://www.linenuniverse.net/shop/hd-1p2c-700-3-piece-silver-decorative-plate-candle-holder-set-19067",
-          "https://www.linenuniverse.net/shop/hd-3o-100-3-piece-gold-decorative-orb-set-19048",
-          "https://www.linenuniverse.net/shop/hd-3o-200-3-piece-gold-decorative-orb-set-19053",
-          "https://www.linenuniverse.net/shop/hd-3o-300-3-piece-silver-decorative-orb-set-19054",
-          "https://www.linenuniverse.net/shop/hd-3o-600-3-piece-gold-decorative-orb-set-19049",
-          "https://www.linenuniverse.net/shop/hd-3o-700-3-piece-silver-decorative-orb-set-19065",
-          "https://www.linenuniverse.net/shop/hd-3o-800-3-piece-gold-decorative-orb-set-19047",
-          "https://www.linenuniverse.net/shop/hd-54s4-beige-and-gold-4-piece-ceramic-vase-set-12-18958",
-          "https://www.linenuniverse.net/shop/hd-56s4-beige-and-gold-4-piece-ceramic-vase-set-12-18959",
-          "https://www.linenuniverse.net/shop/hd-bw3o-100-4-piece-gold-decorative-bowl-orbs-set-19078",
-          "https://www.linenuniverse.net/shop/hd-bw3o-200-4-piece-gold-decorative-bowl-orbs-set-19081",
-          "https://www.linenuniverse.net/shop/hd-bw3o-600-4-piece-gold-decorative-bowl-orbs-set-19079",
-          "https://www.linenuniverse.net/shop/hd-bw3o-800-4-piece-gold-decorative-bowl-orbs-set-19080",
-          "https://www.linenuniverse.net/shop/hd-cvb-1009-ceramic-vase-12-5-18964",
-          "https://www.linenuniverse.net/shop/hd-cvb-1010-ceramic-vase-12-5-18965",
-          "https://www.linenuniverse.net/shop/hd-cvd-1016-ceramic-cylinder-vase-11-19225",
-          "https://www.linenuniverse.net/shop/hd-cvd-1017-ceramic-cylinder-vase-11-19228",
-          "https://www.linenuniverse.net/shop/hd-cvd-1018-ceramic-cylinder-vase-11-19227",
-          "https://www.linenuniverse.net/shop/hd-cvds-2000-2-piece-white-and-silver-ceramic-vase-set-7-19003",
-          "https://www.linenuniverse.net/shop/hd-cvds-2002-2-piece-white-and-gold-ceramic-vase-set-7-19004"
-        ],
+        "no_longer_detected": [],
         "note": "No longer detected is not proof of a fixed destination: a stale link may have been removed or replaced. Compare source evidence. Coverage and rule changes also affect comparisons."
       },
       {
@@ -1122,47 +1090,7 @@
           "https://www.linenuniverse.net/shop/hd-53s4-orange-brown-gold-four-piece-ceramic-vase-accessory-set-10-19643"
         ],
         "newly_detected": [],
-        "no_longer_detected": [
-          "https://www.linenuniverse.net/shop/3-piece-crystal-beaded-candle-holder-set-14-5-h-12-h-and-10-h-19037",
-          "https://www.linenuniverse.net/shop/3-piece-crystal-beaded-candle-holder-set-15-h-13-h-and-9-h-19038",
-          "https://www.linenuniverse.net/shop/embroidered-table-runners-19339",
-          "https://www.linenuniverse.net/shop/embroidered-table-runners-20183",
-          "https://www.linenuniverse.net/shop/hd-1p2c-300-3-piece-silver-decorative-plate-candle-holder-set-19066",
-          "https://www.linenuniverse.net/shop/hd-1p2c-700-3-piece-silver-decorative-plate-candle-holder-set-19067",
-          "https://www.linenuniverse.net/shop/hd-20001s4-beige-and-gold-4-piece-ceramic-vase-set-10-19173",
-          "https://www.linenuniverse.net/shop/hd-3o-100-3-piece-gold-decorative-orb-set-19048",
-          "https://www.linenuniverse.net/shop/hd-3o-200-3-piece-gold-decorative-orb-set-19053",
-          "https://www.linenuniverse.net/shop/hd-3o-300-3-piece-silver-decorative-orb-set-19054",
-          "https://www.linenuniverse.net/shop/hd-3o-600-3-piece-gold-decorative-orb-set-19049",
-          "https://www.linenuniverse.net/shop/hd-3o-700-3-piece-silver-decorative-orb-set-19065",
-          "https://www.linenuniverse.net/shop/hd-3o-800-3-piece-gold-decorative-orb-set-19047",
-          "https://www.linenuniverse.net/shop/hd-54s4-beige-and-gold-4-piece-ceramic-vase-set-12-18958",
-          "https://www.linenuniverse.net/shop/hd-56s4-beige-and-gold-4-piece-ceramic-vase-set-12-18959",
-          "https://www.linenuniverse.net/shop/hd-budb-103-g-gold-buddha-sitting-statue-13-19410",
-          "https://www.linenuniverse.net/shop/hd-budb-105-g-gold-buddha-sitting-statue-13-19411",
-          "https://www.linenuniverse.net/shop/hd-bw3o-100-4-piece-gold-decorative-bowl-orbs-set-19078",
-          "https://www.linenuniverse.net/shop/hd-bw3o-200-4-piece-gold-decorative-bowl-orbs-set-19081",
-          "https://www.linenuniverse.net/shop/hd-bw3o-600-4-piece-gold-decorative-bowl-orbs-set-19079",
-          "https://www.linenuniverse.net/shop/hd-bw3o-800-4-piece-gold-decorative-bowl-orbs-set-19080",
-          "https://www.linenuniverse.net/shop/hd-cvb-1006-swan-ceramic-vase-sculpture-12-19802",
-          "https://www.linenuniverse.net/shop/hd-cvb-1009-ceramic-vase-12-5-18964",
-          "https://www.linenuniverse.net/shop/hd-cvb-1010-ceramic-vase-12-5-18965",
-          "https://www.linenuniverse.net/shop/hd-cvb-1011-swan-ceramic-vase-sculpture-12-18973",
-          "https://www.linenuniverse.net/shop/hd-cvd-1016-ceramic-cylinder-vase-11-19225",
-          "https://www.linenuniverse.net/shop/hd-cvd-1017-ceramic-cylinder-vase-11-19228",
-          "https://www.linenuniverse.net/shop/hd-cvd-1018-ceramic-cylinder-vase-11-19227",
-          "https://www.linenuniverse.net/shop/hd-cvds-2000-2-piece-white-and-silver-ceramic-vase-set-7-19003",
-          "https://www.linenuniverse.net/shop/hd-cvds-2002-2-piece-white-and-gold-ceramic-vase-set-7-19004"
-        ],
-        "note": "No longer detected is not proof of a fixed destination: a stale link may have been removed or replaced. Compare source evidence. Coverage and rule changes also affect comparisons."
-      },
-      {
-        "id": "images-missing-alt-text",
-        "persisting": [],
-        "newly_detected": [],
-        "no_longer_detected": [
-          "https://www.linenuniverse.net/"
-        ],
+        "no_longer_detected": [],
         "note": "No longer detected is not proof of a fixed destination: a stale link may have been removed or replaced. Compare source evidence. Coverage and rule changes also affect comparisons."
       },
       {
@@ -1290,6 +1218,7 @@
           "https://www.linenuniverse.net/shop/celine-sheer-rod-pocket-panel-90-19218",
           "https://www.linenuniverse.net/shop/celine-sheer-scarf-54-x-216-19219",
           "https://www.linenuniverse.net/shop/ceramic-buddha-head-sculpture-10-19224",
+          "https://www.linenuniverse.net/shop/ch-86524-peva-shower-liner-3g-ch86524-20070",
           "https://www.linenuniverse.net/shop/chevy-clipped-doily-grommet-panel-84-19241",
           "https://www.linenuniverse.net/shop/chloe-printed-blackout-panel-54-x-84-19242",
           "https://www.linenuniverse.net/shop/city-living-4-piece-printed-sheet-set-19244",
@@ -1496,6 +1425,7 @@
           "https://www.linenuniverse.net/shop/mosaic-orbs-19618",
           "https://www.linenuniverse.net/shop/mulino-textured-jacquard-swag-valance-48-x-37-19621",
           "https://www.linenuniverse.net/shop/multi-purpose-basket-36-x-36-x-58-19622",
+          "https://www.linenuniverse.net/shop/natlex-reed-diffuser-100ml-20404",
           "https://www.linenuniverse.net/shop/new-york-aromar-perfume-fragrance-oil-60ml-19630",
           "https://www.linenuniverse.net/shop/or-mp-18x24-mohawk-printed-nonserge-outdoor-mat-18-x-24-assorted-19611",
           "https://www.linenuniverse.net/shop/oslo-swag-valance-embroidered-48-x-37-blue-19647",
@@ -1506,6 +1436,7 @@
           "https://www.linenuniverse.net/shop/prague-aromar-perfume-fragrance-oil-60ml-19683",
           "https://www.linenuniverse.net/shop/printed-13-piece-shower-curtain-set-20158",
           "https://www.linenuniverse.net/shop/printed-kitchen-set-3-pack-ch19244-19693",
+          "https://www.linenuniverse.net/shop/pvc-shower-curtain-liner-4g-ch10237-19649",
           "https://www.linenuniverse.net/shop/pvc-shower-curtain-liner-6g-ch10241-19650",
           "https://www.linenuniverse.net/shop/pvc-shower-curtain-liner-ch10238-19652",
           "https://www.linenuniverse.net/shop/pvc-shower-curtain-liner-ch10239-19653",
@@ -1569,16 +1500,8 @@
           "https://www.linenuniverse.net/website/info",
           "https://www.linenuniverse.net/wholesale-acount-form"
         ],
-        "newly_detected": [
-          "https://www.linenuniverse.net/shop/ch-86524-peva-shower-liner-3g-ch86524-20070",
-          "https://www.linenuniverse.net/shop/natlex-reed-diffuser-100ml-20404",
-          "https://www.linenuniverse.net/shop/pvc-shower-curtain-liner-4g-ch10237-19649"
-        ],
-        "no_longer_detected": [
-          "https://www.linenuniverse.net/shop/hotel-suites-collection-cooling-down-alternative-comforter-full-queen-19461",
-          "https://www.linenuniverse.net/shop/peva-shower-liner-3g-ch86524-20070",
-          "https://www.linenuniverse.net/shop/pvc-shower-curtain-liner-ch10237-19649"
-        ],
+        "newly_detected": [],
+        "no_longer_detected": [],
         "note": "No longer detected is not proof of a fixed destination: a stale link may have been removed or replaced. Compare source evidence. Coverage and rule changes also affect comparisons."
       },
       {
@@ -1594,28 +1517,7 @@
           "https://www.linenuniverse.net/shop/category/vases-80"
         ],
         "newly_detected": [],
-        "no_longer_detected": [
-          "https://www.linenuniverse.net/shop/category/accent-rugs-90",
-          "https://www.linenuniverse.net/shop/category/bath-accessories-40",
-          "https://www.linenuniverse.net/shop/category/bath-towel-53",
-          "https://www.linenuniverse.net/shop/category/candleholders-candelabras-74",
-          "https://www.linenuniverse.net/shop/category/festival-collection-rugs-94",
-          "https://www.linenuniverse.net/shop/category/jasmine-rugs-95",
-          "https://www.linenuniverse.net/shop/category/joy-collection-96",
-          "https://www.linenuniverse.net/shop/category/kitchen-curtains-31",
-          "https://www.linenuniverse.net/shop/category/kitchen-rugs-mats-83",
-          "https://www.linenuniverse.net/shop/category/kitchen-towels-aprons-mitts-85",
-          "https://www.linenuniverse.net/shop/category/pillows-mattress-pads-102",
-          "https://www.linenuniverse.net/shop/category/quilts-bedspreads-64",
-          "https://www.linenuniverse.net/shop/category/sculptures-78",
-          "https://www.linenuniverse.net/shop/category/shower-curtains-liners-67",
-          "https://www.linenuniverse.net/shop/category/sofa-covers-protectors-79",
-          "https://www.linenuniverse.net/shop/category/statues-figurines-77",
-          "https://www.linenuniverse.net/shop/category/table-runners-87",
-          "https://www.linenuniverse.net/shop/category/tablecloths-86",
-          "https://www.linenuniverse.net/shop/category/valances-scarves-70",
-          "https://www.linenuniverse.net/shop/category/window-accessories-71"
-        ],
+        "no_longer_detected": [],
         "note": "No longer detected is not proof of a fixed destination: a stale link may have been removed or replaced. Compare source evidence. Coverage and rule changes also affect comparisons."
       },
       {
@@ -1625,84 +1527,6 @@
         ],
         "newly_detected": [],
         "no_longer_detected": [],
-        "note": "No longer detected is not proof of a fixed destination: a stale link may have been removed or replaced. Compare source evidence. Coverage and rule changes also affect comparisons."
-      },
-      {
-        "id": "missing-meta-descriptions",
-        "persisting": [],
-        "newly_detected": [],
-        "no_longer_detected": [
-          "https://www.linenuniverse.net/about-us",
-          "https://www.linenuniverse.net/appointment",
-          "https://www.linenuniverse.net/blog/our-blog-1",
-          "https://www.linenuniverse.net/privacy-policy",
-          "https://www.linenuniverse.net/shop",
-          "https://www.linenuniverse.net/shop/18-piece-embroidery-bath-set-butterfly-18998",
-          "https://www.linenuniverse.net/shop/3-piece-majestic-printed-quilt-set-20184",
-          "https://www.linenuniverse.net/shop/5-arm-crystal-beaded-candelabra-24-5-19090",
-          "https://www.linenuniverse.net/shop/adore-super-clear-heavy-table-cover-19980",
-          "https://www.linenuniverse.net/shop/bth-box-4pcz-w2-4pc-ceramic-bath-set-20321",
-          "https://www.linenuniverse.net/shop/category/area-rugs-48",
-          "https://www.linenuniverse.net/shop/category/bath-107",
-          "https://www.linenuniverse.net/shop/category/bath-bath-accessories-40",
-          "https://www.linenuniverse.net/shop/category/bath-bath-rugs-mats-100",
-          "https://www.linenuniverse.net/shop/category/bath-bath-towel-53",
-          "https://www.linenuniverse.net/shop/category/bath-rug-mats-33",
-          "https://www.linenuniverse.net/shop/category/bath-shower-curtains-liners-67",
-          "https://www.linenuniverse.net/shop/category/bedding-29",
-          "https://www.linenuniverse.net/shop/category/bedding-blankets-throws-66",
-          "https://www.linenuniverse.net/shop/category/bedding-comforters-60",
-          "https://www.linenuniverse.net/shop/category/bedding-pillows-mattress-pads-102",
-          "https://www.linenuniverse.net/shop/category/bedding-quilts-bedspreads-64",
-          "https://www.linenuniverse.net/shop/category/bedding-sheet-sets-65",
-          "https://www.linenuniverse.net/shop/category/dining-109",
-          "https://www.linenuniverse.net/shop/category/dining-placemats-114",
-          "https://www.linenuniverse.net/shop/category/dining-table-runners-87",
-          "https://www.linenuniverse.net/shop/category/dining-tablecloths-86",
-          "https://www.linenuniverse.net/shop/category/fragrances-52",
-          "https://www.linenuniverse.net/shop/category/home-decor-41",
-          "https://www.linenuniverse.net/shop/category/home-decor-candleholders-candelabras-74",
-          "https://www.linenuniverse.net/shop/category/home-decor-decorative-accents-113",
-          "https://www.linenuniverse.net/shop/category/home-decor-decorative-pillows-75",
-          "https://www.linenuniverse.net/shop/category/home-decor-sculptures-78",
-          "https://www.linenuniverse.net/shop/category/home-decor-sofa-covers-protectors-79",
-          "https://www.linenuniverse.net/shop/category/home-decor-statues-figurines-77",
-          "https://www.linenuniverse.net/shop/category/home-decor-vases-80",
-          "https://www.linenuniverse.net/shop/category/kitchen-108",
-          "https://www.linenuniverse.net/shop/category/kitchen-kitchen-rugs-mats-83",
-          "https://www.linenuniverse.net/shop/category/kitchen-kitchen-towels-aprons-mitts-85",
-          "https://www.linenuniverse.net/shop/category/kitchen-towels-37",
-          "https://www.linenuniverse.net/shop/category/novelty-106",
-          "https://www.linenuniverse.net/shop/category/outdoor-mat-50",
-          "https://www.linenuniverse.net/shop/category/rugs-110",
-          "https://www.linenuniverse.net/shop/category/rugs-accent-rugs-90",
-          "https://www.linenuniverse.net/shop/category/rugs-festival-collection-rugs-94",
-          "https://www.linenuniverse.net/shop/category/rugs-jasmine-rugs-95",
-          "https://www.linenuniverse.net/shop/category/rugs-joy-collection-96",
-          "https://www.linenuniverse.net/shop/category/rugs-outdoor-mats-101",
-          "https://www.linenuniverse.net/shop/category/shower-curtains-34",
-          "https://www.linenuniverse.net/shop/category/table-cloth-47",
-          "https://www.linenuniverse.net/shop/category/window-30",
-          "https://www.linenuniverse.net/shop/category/window-curtain-rods-hardware-62",
-          "https://www.linenuniverse.net/shop/category/window-grommet-panels-69",
-          "https://www.linenuniverse.net/shop/category/window-kitchen-curtains-31",
-          "https://www.linenuniverse.net/shop/category/window-rod-pocket-panels-68",
-          "https://www.linenuniverse.net/shop/category/window-valances-scarves-70",
-          "https://www.linenuniverse.net/shop/category/window-window-accessories-71",
-          "https://www.linenuniverse.net/shop/co-3pc-paris-bamboo-cotton-touch-3-piece-queen-comforter-set-paris-collection-asst-19153",
-          "https://www.linenuniverse.net/shop/golden-furniture-protector-110-x-75-732-19426",
-          "https://www.linenuniverse.net/shop/hd-mv-501-embossed-patchwork-multicolor-metal-decorative-vase-24-19331",
-          "https://www.linenuniverse.net/shop/jasmine-collection-area-rug-19475",
-          "https://www.linenuniverse.net/shop/or-mp-18x24-mohawk-printed-nonserge-outdoor-mat-18-x-24-assorted-19611",
-          "https://www.linenuniverse.net/shop/paris-aromar-perfume-fragrance-oil-60ml-19658",
-          "https://www.linenuniverse.net/shop/sc-14pc-atlas-atlas-14-piece-solid-shower-curtain-set-20189",
-          "https://www.linenuniverse.net/shop/squishy-20063",
-          "https://www.linenuniverse.net/shop/tw-400l-as-4882-american-stripe-bath-towel-27x54-4882-19118",
-          "https://www.linenuniverse.net/terms",
-          "https://www.linenuniverse.net/terms-of-service",
-          "https://www.linenuniverse.net/website/info",
-          "https://www.linenuniverse.net/wholesale-acount-form"
-        ],
         "note": "No longer detected is not proof of a fixed destination: a stale link may have been removed or replaced. Compare source evidence. Coverage and rule changes also affect comparisons."
       },
       {
