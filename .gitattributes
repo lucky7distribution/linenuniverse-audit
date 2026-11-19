@@ -1,0 +1,4 @@
+* text=auto eol=lf
+# Audit bytes are checksummed. Never rewrite their line endings on checkout.
+*.json -text
+*.jsonl -text

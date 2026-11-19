@@ -12,6 +12,7 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
+import crawl_sitemap
 from crawl_sitemap import USER_AGENT, page_record
 
 
@@ -28,6 +29,8 @@ def main() -> None:
     with args.crawl_file.open(encoding="utf-8") as stream:
         records = [json.loads(line) for line in stream if line.strip()]
     header = records[0]
+    crawl_sitemap.REQUEST_DELAY = args.delay
+    crawl_sitemap.RUN_ID = header.get("run_id", crawl_sitemap.RUN_ID)
     pages = [record for record in records[1:] if record.get("record_type") == "url"]
     sitemap_urls = {page["url"] for page in pages}
     sources: dict[str, set[str]] = {}
@@ -59,8 +62,10 @@ def main() -> None:
     status_counts: Counter[str] = Counter()
     run_header = {
         "record_type": "crawl",
+        "run_id": header.get("run_id"),
+        "cache_policy": header.get("cache_policy"),
         "started_at": datetime.now(timezone.utc).isoformat(),
-        "source_crawl_file": str(args.crawl_file),
+        "source_crawl_file": args.crawl_file.name,
         "requested_urls": len(urls),
         "delay_seconds": args.delay,
         "scope": "Linked category URLs absent from sitemap; query and paginated routes excluded.",

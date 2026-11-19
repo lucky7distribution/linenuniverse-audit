@@ -1,0 +1,52 @@
+[
+  {
+    "run_id": "20261119T153504Z-fc2c8d28",
+    "completed_at": "2026-11-19T15:43:16.227444+00:00",
+    "summary_url": "/audit-data/runs/20261119T153504Z-fc2c8d28/dashboard-summary.json",
+    "inventory_url": "/audit-data/runs/20261119T153504Z-fc2c8d28/url-inventory.json",
+    "metrics": {
+      "sitemap_urls": 406,
+      "html_pages": 403,
+      "sitemap_http_errors": 0,
+      "cross_host_canonicals": 403,
+      "missing_meta_descriptions": 0,
+      "duplicate_title_groups": 1,
+      "duplicate_title_urls": 2,
+      "duplicate_description_groups": 0,
+      "duplicate_description_urls": 0,
+      "broken_category_destinations": 14,
+      "category_redirects": 8,
+      "sitemap_redirects": 2,
+      "missing_h1_pages": 1,
+      "images_checked": 2222,
+      "images_missing_alt": 0,
+      "images_empty_alt_review": 0,
+      "images_explicitly_decorative": 9,
+      "sitemap_entries_missing_lastmod": 401
+    }
+  },
+  {
+    "run_id": "baseline-2026-11-12",
+    "completed_at": "2026-11-12T19:42:04.131932+00:00",
+    "summary_url": "/audit-data/runs/baseline-2026-11-12/dashboard-summary.json",
+    "inventory_url": "/audit-data/runs/baseline-2026-11-12/url-inventory.json",
+    "metrics": {
+      "sitemap_urls": 406,
+      "html_pages": 403,
+      "sitemap_http_errors": 0,
+      "cross_host_canonicals": 403,
+      "missing_meta_descriptions": 70,
+      "duplicate_title_groups": 13,
+      "duplicate_title_urls": 32,
+      "duplicate_description_groups": 9,
+      "duplicate_description_urls": 23,
+      "broken_category_destinations": 14,
+      "category_redirects": 28,
+      "sitemap_redirects": 2,
+      "missing_h1_pages": 1,
+      "images_checked": 2257,
+      "images_missing_alt": 27,
+      "sitemap_entries_missing_lastmod": 401
+    }
+  }
+]

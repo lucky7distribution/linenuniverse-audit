@@ -742,8 +742,8 @@
           <a href="#reports"><span class="nav-icon">▤</span>Reports</a>
         </nav>
         <div class="sidebar-foot">
-          Initial public crawl<br />
-          406 sitemap URLs · 42 category routes
+          Public crawl evidence<br />
+          <span id="sidebar-scope">Loading latest run…</span>
         </div>
       </aside>
 
@@ -802,6 +802,16 @@
           <p class="scope-note" id="scope-note">
             Audit scope and limitations will appear here when the crawl data loads.
           </p>
+          <div class="table-tools">
+            <button class="download-link" id="reload-results" type="button">Reload published results</button>
+            <a class="download-link" href="https://github.com/lucky7distribution/linenuniverse-audit/actions/workflows/refresh-audit.yml" target="_blank" rel="noopener noreferrer">Run a fresh audit in GitHub</a>
+          </div>
+          <p class="scope-note" id="freshness-note"></p>
+          <section class="panel full-width" aria-label="Audit comparison">
+            <div class="panel-title"><h2>Changes since previous audit</h2><span class="section-note" id="comparison-date"></span></div>
+            <div class="coverage-grid" id="comparison-rows"></div>
+            <p class="scope-note">Counts reflect the checked scope. A link no longer detected may have been replaced or removed; it does not prove the old destination was repaired.</p>
+          </section>
 
           <div class="section-heading">
             <h2>Verified issue register</h2>
@@ -896,16 +906,18 @@
               <div class="panel-title"><h2>Current audit data</h2><span class="section-note">Exports use collected findings</span></div>
               <div class="table-tools">
                 <button class="download-link" id="download-issues" type="button">Download issue register (CSV)</button>
-                <a class="download-link" href="/audit-data/dashboard-summary.json" download="linen-audit-summary.json">Download summary (JSON)</a>
-                <a class="download-link" href="/audit-data/url-inventory.json" download="linen-url-inventory.json">Download URL inventory (JSON)</a>
+                <a class="download-link" id="download-summary" href="/audit-data/dashboard-summary.json" download="linen-audit-summary.json">Download summary (JSON)</a>
+                <a class="download-link" id="download-inventory" href="/audit-data/url-inventory.json" download="linen-url-inventory.json">Download URL inventory (JSON)</a>
+                <a class="download-link" href="/audit-data/history.json" target="_blank" rel="noopener noreferrer">Audit history (JSON)</a>
               </div>
-              <p class="scope-note">These are initial public-crawl exports, not the complete final PDF/XLSX report set.</p>
+              <p class="scope-note">Downloads contain the displayed run. Previous runs are preserved in the history index. PDF/XLSX reports and unmeasured assessments remain outside this refresh.</p>
             </article>
           </section>
           <p class="footer-note">Evidence-based public crawl · authenticated Odoo and Google Search Console data were not used</p>
         </div>
       </main>
     </div>
+    <script src="/audit-loader.js?v=20261119"></script>
     <script>
       const byId = (id) => document.getElementById(id);
       const pageSize = 50;
@@ -914,6 +926,7 @@
       let urlPage = 0;
       let urlSort = "url";
       let urlSortDirection = 1;
+      let loading = false;
 
       function addText(parent, tag, className, text) {
         const element = document.createElement(tag);
@@ -985,6 +998,7 @@
           summary.textContent = "Evidence & recommended fix";
           details.appendChild(summary);
           addText(details, "p", "", item.evidence);
+          addText(details, "p", "", `${item.finding_status || "Confirmed"} · Last checked ${item.last_verified_at || auditData.audit.completed_at}`);
           addText(details, "p", "", `Recommended: ${item.recommended_fix}`);
           if (item.implementation_type) {
             addText(details, "p", "", `Likely implementation area: ${item.implementation_type}`);
@@ -1097,16 +1111,21 @@
       }
 
       async function loadDashboard() {
+        if (loading) return;
+        loading = true;
+        byId("reload-results").disabled = true;
         try {
-          const [summaryResponse, inventoryResponse] = await Promise.all([
-            fetch("/audit-data/dashboard-summary.json", { cache: "no-store" }),
-            fetch("/audit-data/url-inventory.json", { cache: "no-store" }),
-          ]);
-          if (!summaryResponse.ok || !inventoryResponse.ok) {
-            throw new Error(`Audit data request failed (${summaryResponse.status}/${inventoryResponse.status}).`);
-          }
-          auditData = await summaryResponse.json();
-          urlInventory = await inventoryResponse.json();
+          const loaded = await LinenAuditData.load();
+          auditData = loaded.summary;
+          urlInventory = loaded.inventory;
+          byId("download-summary").href = loaded.manifest.summary_url;
+          byId("download-inventory").href = loaded.manifest.inventory_url;
+          byId("data-error").classList.remove("visible");
+          byId("status-dot").classList.remove("failed", "complete");
+          for (const id of ["seo-coverage", "remaining-coverage", "comparison-rows"]) byId(id).replaceChildren();
+          byId("issue-category").replaceChildren(new Option("All categories", ""));
+          byId("url-page-type").replaceChildren(new Option("All page types", ""));
+          urlPage = 0;
 
           const { audit, metrics } = auditData;
           const completed = new Date(audit.completed_at);
@@ -1116,15 +1135,23 @@
           }).format(completed);
           const durationMinutes = Math.round(audit.duration_seconds / 60);
           byId("audit-date").textContent = `Last crawl ${dateText} · about ${durationMinutes} min active crawl time`;
-          byId("audit-status-title").textContent = "Initial public crawl completed";
+          byId("audit-status-title").textContent = audit.unverified_urls?.length ? "Public crawl completed with limitations" : "Latest public crawl completed";
           byId("audit-status-copy").textContent =
-            `${audit.sitemap_urls_checked}/${audit.sitemap_entries} sitemap URLs returned HTTP 200 after redirects. ` +
+            `${audit.sitemap_successful_urls}/${audit.unique_sitemap_urls} sitemap URLs returned HTTP 200 after redirects. ` +
             `${audit.linked_category_urls_checked} linked category paths were checked separately; ` +
-            `${metrics.broken_category_destinations} returned 404.`;
+            `${metrics.broken_category_destinations} returned HTTP errors.`;
           byId("status-dot").classList.add("complete");
           byId("scope-note").textContent =
             `${audit.scope} This is not yet a full navigation/link crawl; excluded route families and unmeasured checks are listed below. ` +
             `No overall health score is calculated from this partial scope.`;
+          byId("sidebar-scope").textContent = `${audit.sitemap_urls_checked} sitemap URLs · ${audit.linked_category_urls_checked} linked category routes`;
+          const ageHours = (Date.now() - completed.getTime()) / 3600000;
+          byId("freshness-note").textContent = `${ageHours > 24 ? "This published crawl is over 24 hours old. " : ""}Run ${audit.run_id} · Reload checks for a newly published report; it does not start a crawl. ${audit.unverified_urls?.length || 0} URLs unverified.`;
+          byId("comparison-date").textContent = auditData.comparison?.previous_completed_at ? `Previous crawl: ${new Date(auditData.comparison.previous_completed_at).toLocaleString()}` : "No previous run";
+          const labels = { missing_meta_descriptions: "Missing meta descriptions", duplicate_title_urls: "URLs sharing duplicate titles", duplicate_description_urls: "URLs sharing duplicate descriptions", broken_category_destinations: "Broken linked category destinations", category_redirects: "Redirecting linked category paths", cross_host_canonicals: "Off-host canonicals" };
+          for (const item of auditData.comparison?.metrics || []) {
+            if (labels[item.metric]) addCoverageRow(byId("comparison-rows"), labels[item.metric], `${item.previous} → ${item.current} (${item.change > 0 ? "+" : ""}${item.change})`);
+          }
 
           setMetric("metric-sitemap", metrics.sitemap_urls);
           setMetric("metric-broken", metrics.broken_category_destinations);
@@ -1169,14 +1196,16 @@
             `${metrics.duplicate_description_groups} / ${metrics.duplicate_description_urls}`,
           );
           addCoverageRow(byId("seo-coverage"), "Pages missing non-empty H1", String(metrics.missing_h1_pages));
-          addCoverageRow(byId("seo-coverage"), "Images missing/empty alt text", String(metrics.images_missing_alt));
+          addCoverageRow(byId("seo-coverage"), "Images missing the alt attribute", String(metrics.images_missing_alt));
+          addCoverageRow(byId("seo-coverage"), "Empty alt text: review context", String(metrics.images_empty_alt_review));
+          addCoverageRow(byId("seo-coverage"), "Explicitly decorative images excluded", String(metrics.images_explicitly_decorative));
           addCoverageRow(byId("remaining-coverage"), "Sitemap HTTP errors", String(metrics.sitemap_http_errors));
-          addCoverageRow(byId("remaining-coverage"), "Sitemap duplicate URLs", "0 observed");
-          addCoverageRow(byId("remaining-coverage"), "robots.txt", "No wildcard disallow observed");
+          addCoverageRow(byId("remaining-coverage"), "Sitemap duplicate URLs", String(audit.duplicate_sitemap_urls));
+          addCoverageRow(byId("remaining-coverage"), "robots.txt", audit.robots_allows_crawling ? "No sampled URLs blocked" : "Some URLs blocked");
           addCoverageRow(
             byId("remaining-coverage"),
             "Linked category routes",
-            `${audit.linked_category_urls_checked} checked · ${metrics.broken_category_destinations} returned 404`,
+            `${audit.linked_category_urls_checked} checked · ${metrics.broken_category_destinations} HTTP errors`,
           );
           addCoverageRow(
             byId("remaining-coverage"),
@@ -1186,13 +1215,16 @@
           addCoverageRow(byId("remaining-coverage"), "Structured data validation", "Not tested");
           addCoverageRow(byId("remaining-coverage"), "External link status", "Not tested");
           addCoverageRow(byId("remaining-coverage"), "Google indexing / traffic", "No Search Console data");
-          byId("download-issues").addEventListener("click", downloadIssueCsv);
         } catch (error) {
           byId("status-dot").classList.add("failed");
           byId("audit-status-title").textContent = "Could not load crawl data";
           byId("audit-status-copy").textContent = "The dashboard did not receive its audit dataset.";
           byId("data-error").textContent = error instanceof Error ? error.message : String(error);
           byId("data-error").classList.add("visible");
+          byId("freshness-note").textContent = auditData ? "Reload failed. The visible results are from the previously loaded crawl; see its timestamp." : "No verified dataset loaded. Try reloading after deployment completes.";
+        } finally {
+          loading = false;
+          byId("reload-results").disabled = false;
         }
       }
 
@@ -1230,6 +1262,8 @@
           renderUrlInventory();
         });
       });
+      byId("download-issues").addEventListener("click", () => { if (auditData) downloadIssueCsv(); });
+      byId("reload-results").addEventListener("click", loadDashboard);
       loadDashboard();
     </script>
   </body>

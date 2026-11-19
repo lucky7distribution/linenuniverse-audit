@@ -1,0 +1,47 @@
+name: Refresh public website audit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: linen-public-audit
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate audit implementation
+        run: |
+          python -m unittest discover -s tests
+          node --test tests/audit-loader.test.cjs
+      - name: Crawl fresh public evidence and build reports
+        run: python scripts/run_audit.py
+      - name: Verify the dashboard with the new dataset
+        run: node --test tests/dashboard.test.cjs
+      - name: Publish completed datasets to the existing Vercel-linked branch
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add audit-data
+          git commit -m "Refresh public website audit evidence"
+          git push origin HEAD:main
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audit-evidence
+          path: audit-data/
+          retention-days: 30

@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,8 +19,12 @@ def load_jsonl(path: Path) -> tuple[dict, list[dict], dict | None]:
     if not rows or rows[0].get("record_type") != "crawl":
         raise ValueError(f"Missing crawl header in {path}")
     end = rows[-1] if rows[-1].get("record_type") == "crawl_end" else None
+    if end is None:
+        raise ValueError(f"Incomplete crawl; previous published data will be preserved: {path}")
     records = rows[1:-1] if end else rows[1:]
     pages = [record for record in records if record.get("record_type") == "url"]
+    if end.get("checked_count") != len(pages) or rows[0].get("requested_urls") != len(pages):
+        raise ValueError(f"Crawl coverage does not match its declared counts: {path}")
     return rows[0], pages, end
 
 
@@ -87,8 +93,14 @@ def main() -> None:
 
     sitemap_header, pages, sitemap_end = load_jsonl(args.sitemap_crawl)
     category_header, categories, category_end = load_jsonl(args.category_crawl)
+    if sitemap_header.get("run_id") != category_header.get("run_id"):
+        raise ValueError("Cannot combine sitemap and category data from different runs")
+    if any(page.get("error") for page in [*pages, *categories]):
+        raise ValueError("Network failures remain unverified; refusing to replace the published report with incomplete evidence")
+    run_id = sitemap_header.get("run_id") or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    previous = json.loads(args.output.read_text(encoding="utf-8")) if args.output.exists() else None
     html_responses = [
-        page for page in pages if "html" in (page.get("content_type") or "").lower()
+        page for page in pages if page.get("status") == 200 and "html" in (page.get("content_type") or "").lower()
     ]
     html_pages = [
         page
@@ -116,7 +128,7 @@ def main() -> None:
     redirected_categories = [
         page
         for page in categories
-        if page.get("final_url") and page["final_url"] != page.get("url")
+        if page.get("status") == 200 and page.get("redirect_chain")
     ]
     redirected_sitemap_urls = [
         page
@@ -133,12 +145,19 @@ def main() -> None:
     ]
 
     missing_alt: list[dict[str, str]] = []
+    empty_alt: list[dict[str, str]] = []
+    decorative_count = 0
     image_count = 0
     for page in html_pages:
         for image in page.get("images", []):
             image_count += 1
             if not image.get("alt", "").strip():
-                missing_alt.append({"page_url": page["url"], "image_url": image.get("src", "")})
+                if image.get("decorative"):
+                    decorative_count += 1
+                elif image.get("alt_present", False):
+                    empty_alt.append({"page_url": page["url"], "image_url": image.get("src", "")})
+                else:
+                    missing_alt.append({"page_url": page["url"], "image_url": image.get("src", "")})
 
     sitemap_host_counts: dict[str, int] = defaultdict(int)
     for page in pages:
@@ -165,8 +184,8 @@ def main() -> None:
             9,
             (
                 f"{len(canonical_mismatches)} of {len(html_pages)} direct sitemap HTML pages declare "
-                "a canonical on linenuniverse.odoo.com. Three representative canonical targets "
-                "were independently checked and returned HTTP 200 with self-canonicals."
+                "a canonical on a different hostname. This is a public markup observation; "
+                "Google's selected canonical has not been measured."
             ),
             sorted(page["url"] for page in canonical_mismatches),
             (
@@ -179,14 +198,14 @@ def main() -> None:
         ),
         issue(
             "broken-category-navigation",
-            "Linked category destinations return 404",
+            "Linked category destinations return HTTP errors",
             "Broken links",
             "High",
             10,
             (
-                f"{len(broken_category_urls)} linked category destinations returned HTTP 404 "
-                f"when rechecked. Each destination was linked from {len(source_pages)} of "
-                f"{len(html_pages)} crawled HTML source pages."
+                f"{len(broken_category_urls)} currently linked category destinations returned HTTP errors. "
+                f"They occur across {len(source_pages)} distinct source URLs among "
+                f"{len(html_responses)} successful sitemap HTML responses. Per-destination source counts are listed below."
             ),
             broken_category_urls,
             (
@@ -278,7 +297,7 @@ def main() -> None:
             ),
             sorted({url for group in duplicate_descriptions for url in group["urls"]}),
             (
-                "Review each duplicate group and use unique titles where the pages target "
+                "Review each duplicate group and use unique descriptions where the pages target "
                 "distinct products or search intents."
             ),
             groups=duplicate_descriptions,
@@ -312,21 +331,21 @@ def main() -> None:
             f"{len(missing_h1)} sitemap HTML pages have no non-empty H1.",
             sorted(missing_h1),
             (
-                "Review the appointment page template and add a descriptive visible heading "
+                "Review each affected page template and add a descriptive visible heading "
                 "where it improves page clarity."
             ),
             implementation_type="Odoo page/template content",
         ),
         issue(
             "images-missing-alt-text",
-            "Image elements have missing or empty alt text",
+            "Image elements are missing the alt attribute",
             "Accessibility & image SEO",
             "Low",
             8,
             (
-                f"{len(missing_alt)} image elements have no non-empty alt text. "
-                "Decorative images may correctly use empty alt text, so review context "
-                "before changing them."
+                f"{len(missing_alt)} image elements have no alt attribute. "
+                f"Separately, {len(empty_alt)} explicitly empty alternatives need contextual review; "
+                f"{decorative_count} explicitly decorative elements were excluded."
             ),
             sorted({image["page_url"] for image in missing_alt}),
             (
@@ -338,6 +357,17 @@ def main() -> None:
             implementation_type="Odoo product/content image administration",
         ),
     ]
+    issues.append(issue(
+        "images-empty-alt-review", "Empty image alternatives need contextual review", "Accessibility & image SEO", "Low", 6,
+        f"{len(empty_alt)} image elements explicitly use empty alt text without an observed decorative marker. This may be correct; manual context review is required.",
+        sorted({image["page_url"] for image in empty_alt}),
+        "Keep empty alt text for decorative or redundant images; describe meaningful images. Do not fill decorative alt text just to clear a counter.",
+        image_count=len(empty_alt), images=empty_alt, finding_status="Needs review",
+    ))
+    issues = [item for item in issues if item["affected_url_count"] > 0]
+    for item in issues:
+        item.setdefault("finding_status", "Confirmed")
+        item["last_verified_at"] = max(sitemap_end["completed_at"], category_end["completed_at"])
 
     started_values = [
         datetime.fromisoformat(value)
@@ -428,6 +458,9 @@ def main() -> None:
 
     data = {
         "audit": {
+            "run_id": run_id,
+            "cache_policy": sitemap_header.get("cache_policy", "Not recorded"),
+            "source_crawl_files": [args.sitemap_crawl.name, args.category_crawl.name],
             "site": "https://www.linenuniverse.net/",
             "started_at": started_at.isoformat(),
             "completed_at": completed_at.isoformat(),
@@ -436,14 +469,19 @@ def main() -> None:
             "sitemap_entries": sitemap_header["sitemap_entries"],
             "unique_sitemap_urls": sitemap_header["unique_sitemap_urls"],
             "sitemap_urls_checked": len(pages),
+            "sitemap_successful_urls": sum(page.get("status") == 200 for page in pages),
+            "duplicate_sitemap_urls": sitemap_header.get("duplicate_sitemap_urls", 0),
             "linked_category_urls_checked": len(categories),
             "status_counts": dict(status_counts),
             "html_pages": len(html_pages),
             "html_responses": len(html_responses),
             "robots_text": sitemap_header["robots_text"],
-            "robots_allows_crawling": True,
+            "robots_allows_crawling": not any(page.get("skipped") for page in pages),
+            "unverified_urls": [page["url"] for page in [*pages, *categories] if page.get("error") or page.get("status") is None],
             "limitations": [
-                "Coverage is sitemap URLs plus 42 linked category paths; this is not yet a full link-graph crawl.",
+                f"Coverage is {len(pages)} sitemap URLs plus {len(categories)} current linked non-sitemap category paths; this is not a full link-graph crawl.",
+                "Missing alt attributes and explicitly empty alt text are now counted separately; old combined alt counts are not directly comparable.",
+                "Cache bypass prevents response reuse in this crawler; application-side generated caches cannot be purged through public HTTP requests.",
                 "Query-string and paginated category URLs were excluded from the linked-category pass.",
                 "External links, performance/Core Web Vitals, rendered/mobile behavior, structured data validation, and authenticated Odoo settings have not yet been audited.",
                 "Google indexation, traffic, rankings, and revenue data were not available.",
@@ -467,6 +505,8 @@ def main() -> None:
             "missing_h1_pages": len(missing_h1),
             "images_checked": image_count,
             "images_missing_alt": len(missing_alt),
+            "images_empty_alt_review": len(empty_alt),
+            "images_explicitly_decorative": decorative_count,
             "sitemap_entries_missing_lastmod": sum(not page.get("lastmod") for page in pages),
         },
         "issues": issues,
@@ -478,16 +518,51 @@ def main() -> None:
             "Google Search Console/indexation",
         ],
     }
+    data["comparison"] = compare_runs(previous, data)
+    for row in inventory:
+        record = next(page for page in [*pages, *categories] if page["url"] == row["url"])
+        row["checked_at"] = record.get("checked_at")
+        row["response_headers"] = record.get("response_headers", {})
+        row["body_sha256"] = record.get("body_sha256")
+
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(
-        json.dumps(data, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    if previous:
+        previous_id = previous["audit"].get("run_id") or "baseline-" + previous["audit"]["completed_at"][:10]
+        archive = args.output.parent / "runs" / previous_id
+        archive.mkdir(parents=True, exist_ok=True)
+        if not (archive / "dashboard-summary.json").exists():
+            (archive / "dashboard-summary.json").write_text(json.dumps(previous, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            prior_inventory = args.output.with_name("url-inventory.json")
+            if prior_inventory.exists():
+                (archive / "url-inventory.json").write_bytes(prior_inventory.read_bytes())
+    run_folder = args.output.parent / "runs" / run_id
+    run_folder.mkdir(parents=True, exist_ok=False)
+    summary_bytes = (json.dumps(data, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    inventory_bytes = (json.dumps(inventory, ensure_ascii=False, separators=(",", ":")) + "\n").encode("utf-8")
+    (run_folder / "dashboard-summary.json").write_bytes(summary_bytes)
+    (run_folder / "url-inventory.json").write_bytes(inventory_bytes)
+    args.output.write_bytes(summary_bytes)
     inventory_path = args.output.with_name("url-inventory.json")
-    inventory_path.write_text(
-        json.dumps(inventory, ensure_ascii=False, separators=(",", ":")) + "\n",
-        encoding="utf-8",
-    )
+    inventory_path.write_bytes(inventory_bytes)
+    manifest = {
+        "run_id": run_id, "completed_at": data["audit"]["completed_at"],
+        "summary_url": f"/audit-data/runs/{run_id}/dashboard-summary.json",
+        "inventory_url": f"/audit-data/runs/{run_id}/url-inventory.json",
+        "summary_sha256": hashlib.sha256(summary_bytes).hexdigest(),
+        "inventory_sha256": hashlib.sha256(inventory_bytes).hexdigest(),
+    }
+    history = []
+    for stored in sorted((args.output.parent / "runs").glob("*/dashboard-summary.json")):
+        saved = json.loads(stored.read_text(encoding="utf-8"))
+        history.append({"run_id": stored.parent.name, "completed_at": saved["audit"]["completed_at"],
+                        "summary_url": f"/audit-data/runs/{stored.parent.name}/dashboard-summary.json",
+                        "inventory_url": f"/audit-data/runs/{stored.parent.name}/url-inventory.json",
+                        "metrics": saved["metrics"]})
+    (args.output.parent / "history.json").write_text(json.dumps(sorted(history, key=lambda item: item["completed_at"], reverse=True), indent=2) + "\n", encoding="utf-8")
+    pointer = args.output.parent / "latest.json"
+    temporary = pointer.with_suffix(".tmp")
+    temporary.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    os.replace(temporary, pointer)
     print(f"Saved dashboard data: {args.output.resolve()}")
     print(f"Saved URL inventory: {inventory_path.resolve()} ({len(inventory)} URLs)")
     print(
@@ -496,6 +571,27 @@ def main() -> None:
         f"cross-host canonicals={len(canonical_mismatches)}; "
         f"broken category targets={len(broken_categories)}"
     )
+
+
+def compare_runs(previous: dict | None, current: dict) -> dict:
+    if not previous:
+        return {"previous_completed_at": None, "metrics": [], "issues": []}
+    comparisons = []
+    for key, value in current["metrics"].items():
+        old = previous.get("metrics", {}).get(key)
+        if isinstance(value, int) and isinstance(old, int):
+            comparisons.append({"metric": key, "previous": old, "current": value, "change": value - old,
+                                "comparable": key != "images_missing_alt"})
+    before = {item["id"]: item for item in previous.get("issues", [])}
+    after = {item["id"]: item for item in current.get("issues", [])}
+    issue_rows = []
+    for key in sorted(before.keys() | after.keys()):
+        old = set(before.get(key, {}).get("affected_urls", []))
+        new = set(after.get(key, {}).get("affected_urls", []))
+        issue_rows.append({"id": key, "persisting": sorted(old & new), "newly_detected": sorted(new - old),
+                           "no_longer_detected": sorted(old - new),
+                           "note": "No longer detected is not proof of a fixed destination: a stale link may have been removed or replaced. Compare source evidence. Coverage and rule changes also affect comparisons."})
+    return {"previous_completed_at": previous["audit"]["completed_at"], "metrics": comparisons, "issues": issue_rows}
 
 
 if __name__ == "__main__":

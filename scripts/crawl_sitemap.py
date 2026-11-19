@@ -4,8 +4,12 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import threading
 import time
+import uuid
+from concurrent.futures import ThreadPoolExecutor
 import urllib.error
 import urllib.parse
 import urllib.robotparser
@@ -21,6 +25,33 @@ SITEMAP_URL = urllib.parse.urljoin(SITE_ROOT, "sitemap.xml")
 ROBOTS_URL = urllib.parse.urljoin(SITE_ROOT, "robots.txt")
 USER_AGENT = "LinenUniverseAudit/1.0 (read-only public-site crawl)"
 NAMESPACE = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
+ALLOWED_HOSTS = {"www.linenuniverse.net", "linenuniverse.net"}
+CACHE_KEY = "_linen_audit"
+RUN_ID = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:8]
+_request_lock = threading.Lock()
+_last_request = 0.0
+REQUEST_DELAY = 0.5
+
+
+def validate_url(url: str) -> None:
+    parts = urllib.parse.urlsplit(url)
+    if parts.scheme != "https" or parts.hostname not in ALLOWED_HOSTS or parts.username or parts.password or parts.port not in (None, 443):
+        raise ValueError(f"Out-of-scope crawl URL: {url}")
+
+
+def clean_audit_url(url: str) -> str:
+    parts = urllib.parse.urlsplit(url)
+    query = urllib.parse.urlencode([(k, v) for k, v in urllib.parse.parse_qsl(parts.query, keep_blank_values=True) if k != CACHE_KEY])
+    return urllib.parse.urlunsplit((parts.scheme, parts.netloc, parts.path, query, ""))
+
+
+def reserve_request() -> None:
+    global _last_request
+    with _request_lock:
+        wait = REQUEST_DELAY - (time.monotonic() - _last_request)
+        if wait > 0:
+            time.sleep(wait)
+        _last_request = time.monotonic()
 
 
 class PageParser(HTMLParser):
@@ -60,6 +91,8 @@ class PageParser(HTMLParser):
                 {
                     "src": values.get("src", "") or "",
                     "alt": values.get("alt", "") or "",
+                    "alt_present": "alt" in values,
+                    "decorative": (values.get("role") in {"presentation", "none"} or values.get("aria-hidden", "").lower() == "true" or "o_decorative_image" in (values.get("class") or "").split()),
                     "width": values.get("width", "") or "",
                     "height": values.get("height", "") or "",
                 }
@@ -92,26 +125,42 @@ class RedirectRecorder(urllib.request.HTTPRedirectHandler):
         self.chain: list[str] = []
 
     def redirect_request(self, req, fp, code, msg, headers, newurl):
-        self.chain.append(urllib.parse.urljoin(req.full_url, newurl))
+        validate_url(urllib.parse.urljoin(req.full_url, newurl))
+        self.chain.append(clean_audit_url(urllib.parse.urljoin(req.full_url, newurl)))
+        reserve_request()
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 def fetch(url: str, timeout: int = 25) -> tuple[int, str, object, bytes, list[str]]:
-    recorder = RedirectRecorder()
-    opener = urllib.request.build_opener(recorder)
-    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    try:
-        response = opener.open(request, timeout=timeout)
-    except urllib.error.HTTPError as error:
-        return error.code, error.geturl(), error.headers, error.read(), recorder.chain
-    with response:
-        return (
-            response.status,
-            response.geturl(),
-            response.headers,
-            response.read(),
-            recorder.chain,
-        )
+    validate_url(url)
+    for attempt in range(2):
+        recorder = RedirectRecorder()
+        opener = urllib.request.build_opener(recorder)
+        parts = urllib.parse.urlsplit(url)
+        query = urllib.parse.parse_qsl(parts.query, keep_blank_values=True)
+        query.append((CACHE_KEY, RUN_ID + "-" + uuid.uuid4().hex[:8]))
+        request_url = urllib.parse.urlunsplit((parts.scheme, parts.netloc, parts.path, urllib.parse.urlencode(query), ""))
+        request = urllib.request.Request(request_url, headers={"User-Agent": USER_AGENT, "Cache-Control": "no-cache, no-store, max-age=0", "Pragma": "no-cache"})
+        reserve_request()
+        try:
+            try:
+                response = opener.open(request, timeout=timeout)
+            except urllib.error.HTTPError as error:
+                response = error
+            with response:
+                result = (response.code, clean_audit_url(response.geturl()), response.headers, response.read(), recorder.chain)
+            if attempt == 0 and (result[0] in {404, 408, 429} or result[0] >= 500):
+                retry_after = result[2].get("Retry-After", "2")
+                time.sleep(min(30, max(2, int(retry_after) if retry_after.isdigit() else 2)))
+                continue
+            result[2]["X-Linen-Audit-Attempts"] = str(attempt + 1)
+            result[2]["X-Linen-Audit-Request-URL"] = request_url
+            return result
+        except (urllib.error.URLError, TimeoutError):
+            if attempt:
+                raise
+            time.sleep(2)
+    raise RuntimeError("Fetch did not produce a response")
 
 
 def read_sitemap(url: str, seen: set[str]) -> list[dict[str, str | None]]:
@@ -164,6 +213,10 @@ def page_record(entry: dict[str, str | None]) -> dict[str, object]:
                 "content_type": headers.get("Content-Type"),
                 "x_robots_tag": headers.get("X-Robots-Tag"),
                 "bytes": len(body),
+                "body_sha256": hashlib.sha256(body).hexdigest(),
+                "request_url": headers.get("X-Linen-Audit-Request-URL"),
+                "attempts": int(headers.get("X-Linen-Audit-Attempts", "1")),
+                "response_headers": {name: headers.get(name) for name in ("Date", "Age", "Cache-Control", "ETag", "Last-Modified", "X-Cache", "X-Vercel-Cache") if headers.get(name) is not None},
             }
         )
         if "html" in (headers.get("Content-Type") or "").lower():
@@ -195,7 +248,7 @@ def page_record(entry: dict[str, str | None]) -> dict[str, object]:
                     "images": parser.images,
                 }
             )
-    except (urllib.error.URLError, TimeoutError, ValueError) as error:
+    except (urllib.error.URLError, TimeoutError, ValueError, OSError) as error:
         record["error"] = f"{type(error).__name__}: {error}"
     return record
 
@@ -205,9 +258,12 @@ def main() -> None:
     cli.add_argument("--delay", type=float, default=1.0, help="Seconds between page requests")
     cli.add_argument("--limit", type=int, help="Optional maximum number of sitemap URLs to check")
     cli.add_argument("--output", type=Path, help="JSONL output path")
+    cli.add_argument("--workers", type=int, default=3, choices=range(1, 5), help="Concurrent readers; all request starts share the delay limit")
     args = cli.parse_args()
     if args.delay < 0.5:
         cli.error("--delay must be at least 0.5 seconds to keep the crawl conservative")
+    global REQUEST_DELAY
+    REQUEST_DELAY = args.delay
 
     status, _, _, robots_body, _ = fetch(ROBOTS_URL)
     if status != 200:
@@ -235,6 +291,8 @@ def main() -> None:
 
     header = {
         "record_type": "crawl",
+        "run_id": RUN_ID,
+        "cache_policy": "Unique per-request query nonce, no-cache/no-store headers, no local response reuse; response cache headers and SHA-256 recorded. Origin-generated caches cannot be forcibly purged by this public crawler.",
         "started_at": datetime.now(timezone.utc).isoformat(),
         "site_root": SITE_ROOT,
         "robots_url": ROBOTS_URL,
@@ -251,34 +309,27 @@ def main() -> None:
 
     errors = 0
     status_counts: Counter[str] = Counter()
+    def check(entry):
+        if not robots.can_fetch(USER_AGENT, entry["url"] or ""):
+            return {"record_type": "url", "source": "sitemap", **entry, "checked_at": datetime.now(timezone.utc).isoformat(), "status": None, "skipped": "Disallowed by robots.txt"}
+        return page_record(entry)
+
     with output.open("x", encoding="utf-8", newline="\n") as stream:
         stream.write(json.dumps(header, ensure_ascii=False) + "\n")
-        for index, entry in enumerate(ordered_entries, start=1):
-            url = entry["url"] or ""
-            if not robots.can_fetch(USER_AGENT, url):
-                result: dict[str, object] = {
-                    "record_type": "url",
-                    "source": "sitemap",
-                    **entry,
-                    "checked_at": datetime.now(timezone.utc).isoformat(),
-                    "status": None,
-                    "skipped": "Disallowed by robots.txt",
-                }
-            else:
-                result = page_record(entry)
-            if result.get("error"):
-                errors += 1
-            status_counts[str(result.get("status", "not_checked"))] += 1
-            stream.write(json.dumps(result, ensure_ascii=False) + "\n")
-            stream.flush()
-            if index == 1 or index % 20 == 0 or index == len(ordered_entries):
-                print(
-                    f"{index}/{len(ordered_entries)} checked; "
-                    f"errors={errors}; latest={url}",
-                    flush=True,
-                )
-            if index < len(ordered_entries):
-                time.sleep(args.delay)
+        with ThreadPoolExecutor(max_workers=args.workers) as executor:
+            for index, result in enumerate(executor.map(check, ordered_entries), start=1):
+                url = result["url"]
+                if result.get("error"):
+                    errors += 1
+                status_counts[str(result.get("status", "not_checked"))] += 1
+                stream.write(json.dumps(result, ensure_ascii=False) + "\n")
+                stream.flush()
+                if index == 1 or index % 20 == 0 or index == len(ordered_entries):
+                    print(
+                        f"{index}/{len(ordered_entries)} checked; "
+                        f"errors={errors}; latest={url}",
+                        flush=True,
+                    )
 
         stream.write(
             json.dumps(
